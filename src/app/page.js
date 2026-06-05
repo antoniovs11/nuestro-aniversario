@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 export default function Home() {
   const fechaInicio = new Date(2025, 10, 4, 0, 0, 0); 
 
-  const [tiempo, setTiempo] = useState({ dias: 0, horas: 0, minutes: 0, segundos: 0 });
+  const [tiempo, setTiempo] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
   const [cartaAbierta, setCartaAbierta] = useState(null);
   const [corazones, setCorazones] = useState([]);
   const [mostrarIntro, setMostrarIntro] = useState(true);
@@ -23,12 +23,17 @@ export default function Home() {
   // Condición para quitar el candado general
   const [preguntaDesbloqueada, setPreguntaDesbloqueada] = useState(false);
   
-  // NUEVO: Estado para abrir la carta romántica/miedo antes de la pregunta final
+  // Estado para abrir la carta romántica/miedo antes de la pregunta final
   const [cartaFinalLeida, setCartaFinalLeida] = useState(false);
 
   const [noPosicion, setNoPosicion] = useState({ x: 0, y: 0 });
   const [haIntentadoNo, setHaIntentadoNo] = useState(false);
+  
+  // FASES DEL JUEGO GANADO
   const [juegoGanado, setJuegoGanado] = useState(false);
+  const [mostrarTemporizador, setMostrarTemporizador] = useState(false);
+  const [cuentaRegresiva, setCuentaRegresiva] = useState(15);
+  const [mostrarMensajeFinal, setMostrarMensajeFinal] = useState(false);
 
   useEffect(() => {
     const intervalo = setInterval(() => {
@@ -53,6 +58,22 @@ export default function Home() {
       setPreguntaDesbloqueada(true);
     }
   }, [capitulo1Abierto, capitulo2Abierto, capitulo3Abierto, cartasLeidas]);
+
+  // MANEJO DE LA CUENTA REGRESIVA AL ACEPTAR EL TICKET
+  useEffect(() => {
+    let temporizadorId;
+    if (mostrarTemporizador && cuentaRegresiva > 0) {
+      temporizadorId = setTimeout(() => {
+        setCuentaRegresiva(c => c - 1);
+        lanzarCorazones(3); // Pequeños destellos de corazones mientras cuenta
+      }, 1000);
+    } else if (mostrarTemporizador && cuentaRegresiva === 0) {
+      setMostrarTemporizador(false);
+      setMostrarMensajeFinal(true);
+      lanzarCorazones(50); // ¡Explosión al abrir el mensaje!
+    }
+    return () => clearTimeout(temporizadorId);
+  }, [mostrarTemporizador, cuentaRegresiva]);
 
   const iniciarExperiencia = () => {
     setMostrarIntro(false);
@@ -104,6 +125,16 @@ export default function Home() {
     lanzarCorazones(2);
   };
 
+  // Al dar clic en SÍ, primero mostramos el ticket, y daremos paso al contador
+  const manejarAceptarPregunta = () => {
+    setJuegoGanado(true);
+    lanzarCorazones(40);
+    // Esperamos 5 segundos viendo el Ticket y luego salta el contador de 15 segundos en pantalla completa
+    setTimeout(() => {
+      setMostrarTemporizador(true);
+    }, 5000);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-tr from-[#fff5f5] via-[#fff0f3] to-[#fef6e4] text-slate-800 font-sans overflow-x-hidden relative selection:bg-rose-200 scroll-smooth">
       
@@ -130,6 +161,45 @@ export default function Home() {
         </div>
       )}
 
+      {/* TEMPORIZADOR INTERMEDIO EN PANTALLA COMPLETA */}
+      {mostrarTemporizador && (
+        <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[99999] flex flex-col items-center justify-center p-4 text-center select-none animate-reveal">
+          <div className="max-w-sm">
+            <span className="text-5xl mb-4 block animate-spin-slow">⏳</span>
+            <h3 className="text-xl font-black text-rose-400 uppercase tracking-widest mb-2">Preparando una última sorpresa...</h3>
+            <p className="text-slate-400 text-xs mb-8 font-medium">Espera un momento, por favor. Algo hermoso está cargando.</p>
+            <div className="w-28 h-28 rounded-full border-4 border-rose-500/30 border-t-rose-500 flex items-center justify-center animate-pulse shadow-[0_0_30px_rgba(244,63,94,0.2)] mx-auto">
+              <span className="text-4xl font-black text-white font-mono">{cuentaRegresiva}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PANTALLA COMPLETA: MENSAJE AGRADECIMIENTO DEL REGALO */}
+      {mostrarMensajeFinal && (
+        <div className="fixed inset-0 bg-gradient-to-tr from-rose-500 via-purple-600 to-pink-500 z-[99999] flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-2xl max-w-md mx-auto border border-white/20 transform animate-scale-up text-center">
+            <span className="text-5xl mb-4 block animate-bounce">🎁💝</span>
+            <h3 className="text-2xl font-black text-slate-800 tracking-tight mb-4">Un Detalle Desde mi Corazón</h3>
+            
+            <p className="text-slate-600 text-xs md:text-sm leading-relaxed font-medium mb-8 italic">
+              "Mi reina... Sé perfectamente que una pantalla o unas líneas de código jamás podrán competir con el hermoso regalo que tú me diste. Lo que hiciste por mí superó todo, llenó mi alma y me demostró lo increíble que eres. No sé si este espacio alcance a compensar un poquito de ese detalle tan maravilloso tuyo, pero espero que te recuerde que mi amor por ti es inmenso y que me haces el novio más feliz del mundo."
+            </p>
+
+            <button
+              onClick={() => lanzarCorazones(80)}
+              className="bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black px-8 py-4 rounded-full text-xs uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 animate-pulse"
+            >
+              ✨ Si llegaste hasta aquí haz clic ✨
+            </button>
+            
+            <p className="text-[10px] text-slate-400 mt-6 font-semibold uppercase tracking-wider">
+              ¡Gracias por estos 7 meses mágicos! 🦖❤️
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* BOTÓN MÚSICA */}
       {!mostrarIntro && (
         <div className="fixed bottom-6 right-6 z-[100]">
@@ -147,7 +217,7 @@ export default function Home() {
       {corazones.map((corazon) => (
         <span
           key={corazon.id}
-          className="absolute pointer-events-none z-50 select-none opacity-60 filter drop-shadow-sm"
+          className="absolute pointer-events-none z-[100000] select-none opacity-80 filter drop-shadow-md"
           style={{
             left: `${corazon.left}%`,
             bottom: '-50px',
@@ -345,10 +415,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. SECCIÓN FINAL INTERACTIVA (CON EL PASO DEL MIEDO/ROMANTICISMO) */}
+      {/* 4. SECCIÓN FINAL INTERACTIVA */}
       <section className="py-24 px-4 text-center max-w-xl mx-auto relative z-20 min-h-[480px] flex flex-col items-center justify-center">
         
-        {/* PASO A: BLOQUEADO (FALTA LEER CONTENIDO PREVIO) */}
+        {/* PASO A: BLOQUEADO */}
         {!preguntaDesbloqueada && (
           <div className="bg-slate-100/60 border-2 border-dashed border-slate-300 p-8 rounded-[2.5rem] w-full flex flex-col items-center justify-center animate-reveal">
             <span className="text-4xl mb-4 animate-bounce">🔒</span>
@@ -367,7 +437,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* PASO B: DESBLOQUEADO PERO CERRADO (SOBRE FINAL ÍNTIMO) */}
+        {/* PASO B: DESBLOQUEADO PERO CERRADO */}
         {preguntaDesbloqueada && !cartaFinalLeida && (
           <div 
             onClick={() => { setCartaFinalLeida(true); lanzarCorazones(25); }}
@@ -387,7 +457,6 @@ export default function Home() {
         {/* PASO C: CARTA ABIERTA (ROMANTICISMO + MIEDO) */}
         {preguntaDesbloqueada && cartaFinalLeida && !juegoGanado && (
           <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.04)] border border-slate-100 w-full animate-fold-open text-left relative">
-            {/* Cinta decorativa vintage */}
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-rose-200/60 w-24 h-5 rotate-1 pointer-events-none"></div>
             
             <h3 className="text-xs uppercase tracking-widest font-black text-rose-500 mb-4 text-center">Antes de que me respondas...</h3>
@@ -406,7 +475,6 @@ export default function Home() {
 
             <hr className="border-dashed border-slate-200 mb-6" />
 
-            {/* PREGUNTA FINAL Y BOTONES */}
             <div className="text-center">
               <h4 className="text-base md:text-lg font-black text-slate-800 tracking-tight mb-6">
                 Sabiendo esto... ¿Me dejarías seguir haciéndote la mujer más feliz del universo por el resto de nuestros meses y años? 🧸
@@ -414,7 +482,7 @@ export default function Home() {
 
               <div className="flex items-center justify-center gap-4 h-14 relative">
                 <button 
-                  onClick={() => { setJuegoGanado(true); lanzarCorazones(60); }}
+                  onClick={manejarAceptarPregunta}
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3.5 rounded-full shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs uppercase tracking-widest z-10 border-b-4 border-emerald-600"
                 >
                   ¡SÍ, OBVIO! 💖
@@ -437,7 +505,7 @@ export default function Home() {
         )}
 
         {/* PASO D: PANTALLA GANADA (TICKET FINAL) */}
-        {juegoGanado && (
+        {juegoGanado && !mostrarTemporizador && !mostrarMensajeFinal && (
           <div className="w-full animate-scale-up flex flex-col items-center">
             <div className="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden mb-6 w-full border border-purple-900/30">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:16px_16px]"></div>
@@ -471,10 +539,6 @@ export default function Home() {
                 📸 ¡Tómale captura para canjearlo!
               </div>
             </div>
-
-            <p className="text-[10px] text-slate-400 mt-12 font-medium italic">
-              Diseñado con todo el amor del mundo. Felices 7 meses.
-            </p>
           </div>
         )}
       </section>
@@ -483,9 +547,9 @@ export default function Home() {
       <style jsx global>{`
         @keyframes floatUp {
           0% { transform: translateY(0) rotate(0deg) scale(0.7); opacity: 0; }
-          15% { opacity: 0.6; }
-          85% { opacity: 0.6; }
-          100% { transform: translateY(-105vh) rotate(180deg) scale(1.1); opacity: 0; }
+          15% { opacity: 0.8; }
+          85% { opacity: 0.8; }
+          100% { transform: translateY(-105vh) rotate(180deg) scale(1.2); opacity: 0; }
         }
         @keyframes reveal {
           from { opacity: 0; transform: translateY(15px); filter: blur(4px); }
@@ -503,10 +567,15 @@ export default function Home() {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.02); }
         }
+        @keyframes spinSlow {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
         .animate-reveal { animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-fold-open { animation: foldOpen 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .animate-scale-up { animation: scaleUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-pulse-slow { animation: pulseSlow 4s ease-in-out infinite; }
+        .animate-spin-slow { animation: spinSlow 3s linear infinite; }
         .bg-radial-card { background: radial-gradient(circle at top, #fffafb, #ffffff); }
       `}</style>
     </main>
