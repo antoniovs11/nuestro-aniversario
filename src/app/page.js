@@ -18,6 +18,11 @@ export default function Home() {
   const [capitulo2Abierto, setCapitulo2Abierto] = useState(false);
   const [capitulo3Abierto, setCapitulo3Abierto] = useState(false);
 
+  // ESTADOS PARA EL JUEGO DEL BOTÓN FINAL TRUCO
+  const [noPosicion, setNoPosicion] = useState({ x: 0, y: 0 });
+  const [haIntentadoNo, setHaIntentadoNo] = useState(false);
+  const [juegoGanado, setJuegoGanado] = useState(false);
+
   useEffect(() => {
     const intervalo = setInterval(() => {
       const ahora = new Date();
@@ -68,6 +73,21 @@ export default function Home() {
     }, 6000);
   };
 
+  // FUNCIÓN PARA MOVER EL BOTÓN "NO"
+  const moverBotonNo = () => {
+    setHaIntentadoNo(true);
+    const randomX = Math.random() * (160 - (-160)) + (-160);
+    const randomY = Math.random() * (120 - (-120)) + (-120);
+    setNoPosicion({ x: randomX, y: randomY });
+    lanzarCorazones(3);
+  };
+
+  // AL PRESIONAR "SÍ"
+  const presionarSi = () => {
+    setJuegoGanado(true);
+    lanzarCorazones(60);
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-amber-50 text-slate-800 font-sans overflow-x-hidden relative selection:bg-rose-200">
       
@@ -104,11 +124,11 @@ export default function Home() {
           >
             {reproduciendo ? (
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 animate-pulse">
-                <path fillRule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3.33 3.33 0 0 0-1.5-.303c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5V5.71l5.047.841a.75.75 0 0 1 .62.742v4.21a3.33 3.33 0 0 0-1.5-.303c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5V3.125a.75.75 0 0 1 .498-.707l-15-5a.75.75 0 0 1-.498.707v13.178a3.33 3.33 0 0 0-1.5-.303c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5V1.651a.75.75 0 0 1 .952-.72l15 5ZM6 18.5c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5S8.328 20 7.5 20 6 19.328 6 18.5Zm12 0c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5s-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5Z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3.33 3.33 0 0 0-1.5-.303c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5V5.71l5.047.841a.75.75 0 0 1 .62.742v4.21a3.33 3.33 0 0 0-1.5-.303c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5V1.651a.75.75 0 0 1 .952-.72l15 5ZM6 18.5c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5S8.328 20 7.5 20 6 19.328 6 18.5Zm12 0c0-.828.672-1.5 1.5-1.5s1.5.672 1.5 1.5s-.672 1.5-1.5 1.5s-1.5-.672-1.5-1.5Z" clipRule="evenodd" />
               </svg>
             ) : (
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 .28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z" />
               </svg>
             )}
           </button>
@@ -312,7 +332,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. CUATRO CARTAS DE AMOR SECRETAS (INCLUYENDO LA NOTA DE RECONCILIACIÓN OCULTA) */}
+      {/* 3. CUATRO CARTAS DE AMOR SECRETAS */}
       <section className="bg-gradient-to-r from-rose-100/40 via-purple-100/40 to-amber-100/40 py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -385,7 +405,7 @@ export default function Home() {
               )}
             </div>
 
-            {/* CARTA 4: LA NOTA DE TU CORAZÓN (RECONCILIACIÓN ESCONDIDA) */}
+            {/* CARTA 4: LA NOTA DE TU CORAZÓN */}
             <div 
               onClick={() => { setCartaAbierta(cartaAbierta === 4 ? null : 4); lanzarCorazones(10); }}
               className={`p-5 rounded-[2rem] shadow-xl border cursor-pointer transition-all duration-500 text-center flex flex-col justify-center items-center h-72 relative overflow-hidden ${cartaAbierta === 4 ? 'bg-rose-50 border-rose-400 ring-4 ring-rose-200 scale-102 shadow-2xl' : 'bg-gradient-to-br from-rose-50 to-pink-100 border-rose-200 hover:shadow-2xl hover:-translate-y-1'}`}
@@ -406,26 +426,82 @@ export default function Home() {
                 </div>
               )}
             </div>
-
           </div>
         </div>
       </section>
 
-      {/* 4. SECCIÓN FINAL CON GRAN CLÍMAX */}
-      <section className="py-24 px-4 text-center max-w-xl mx-auto relative z-20">
-        <h3 className="text-3xl font-black text-slate-800 mb-3">¿Lista para el gran final?</h3>
-        <p className="text-slate-500 mb-8 font-medium">He preparado una explosión de amor para ti aquí abajo.</p>
-        
-        <button 
-          onClick={() => lanzarCorazones(45)}
-          className="bg-gradient-to-r from-rose-500 via-pink-500 to-purple-600 text-white font-black px-10 py-5 rounded-full shadow-2xl hover:shadow-rose-300/60 hover:scale-105 active:scale-95 transition-all duration-300 tracking-wider text-base uppercase animate-pulse"
-        >
-          ❤️ ¡Explosión de Corazones! ❤️
-        </button>
+      {/* 4. SECCIÓN FINAL CON JUEGO DINÁMICO Y TICKET DORADO */}
+      <section className="py-28 px-4 text-center max-w-2xl mx-auto relative z-20 min-h-[500px] flex flex-col items-center justify-center">
+        {!juegoGanado ? (
+          <div className="bg-white/60 backdrop-blur-xl p-8 md:p-12 rounded-[3rem] border border-white shadow-2xl w-full max-w-xl animate-fade-in">
+            <span className="text-4xl mb-4 block">🥺</span>
+            <h3 className="text-2xl md:text-3xl font-black text-slate-800 tracking-tight mb-2">Una Última Pregunta...</h3>
+            <p className="text-slate-600 text-sm md:text-base mb-10 font-medium">
+              ¿Me dejarías seguir haciéndote la mujer más feliz del universo por el resto de nuestros meses y años? 🧸
+            </p>
 
-        <p className="text-xs text-slate-400 mt-20 font-medium italic">
-          Diseñado con todo el amor de mi vida para ti. Felices 7 meses.
-        </p>
+            <div className="flex items-center justify-center gap-6 h-16 relative">
+              {/* BOTÓN SÍ */}
+              <button 
+                onClick={presionarSi}
+                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-10 py-4 rounded-full shadow-lg hover:scale-110 active:scale-95 transition-all duration-300 tracking-wider text-base uppercase z-10"
+              >
+                ¡SÍ, OBVIO! 💖
+              </button>
+
+              {/* BOTÓN NO CON TRAMPA ESCAPISTA */}
+              <button 
+                onMouseEnter={moverBotonNo}
+                onClick={moverBotonNo}
+                style={{
+                  transform: `translate(${noPosicion.x}px, ${noPosicion.y}px)`,
+                  transition: 'transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1)'
+                }}
+                className="bg-slate-200 text-slate-500 font-bold px-6 py-3 rounded-full text-sm shadow-md cursor-pointer whitespace-nowrap"
+              >
+                {haIntentadoNo ? "¡Oye, aquí no! 😜" : "No, gracias"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* PANTALLA DE CLÍMAX DEFINITIVO */
+          <div className="w-full max-w-xl animate-fade-in flex flex-col items-center">
+            <div className="bg-gradient-to-tr from-rose-500 via-pink-500 to-purple-600 text-white p-8 md:p-10 rounded-[3rem] shadow-2xl border border-rose-300 relative overflow-hidden mb-8 w-full">
+              <div className="absolute -right-10 -top-10 text-9xl opacity-10">✨</div>
+              <span className="text-5xl mb-4 block animate-bounce">👑</span>
+              <h3 className="text-3xl font-black tracking-tight mb-3">¡Sabía que dirías que SÍ!</h3>
+              <p className="text-sm md:text-base text-rose-50 font-medium leading-relaxed mb-0">
+                Gracias por darme la oportunidad de amarte cada día más. Prometo cuidarte, escucharte, hacerte reír a carcajadas y construir un futuro hermoso de tu mano. ¡Eres el amor de mi vida! 🪐
+              </p>
+            </div>
+
+            {/* RECOMPENSA DE GANADORA: TICKET DIGITAL PERSONALIZADO */}
+            <div className="bg-amber-50 border-4 border-dashed border-amber-400 p-6 rounded-3xl shadow-2xl max-w-md w-full relative overflow-hidden transform rotate-1 hover:rotate-0 transition-transform duration-500 group">
+              <div className="absolute top-1/2 -left-3 w-6 h-6 bg-rose-50 rounded-full border-r-4 border-amber-400 transform -translate-y-1/2"></div>
+              <div className="absolute top-1/2 -right-3 w-6 h-6 bg-rose-50 rounded-full border-l-4 border-amber-400 transform -translate-y-1/2"></div>
+              
+              <div className="border-b-2 border-dashed border-amber-300 pb-4 text-center">
+                <span className="text-xs uppercase font-extrabold tracking-widest text-amber-600 block mb-1">Pase Oficial de San Valentín & Aniversario</span>
+                <h4 className="text-xl font-black text-amber-800 tracking-tight">🎟️ TICKET DEL AMOR INFINITO</h4>
+              </div>
+
+              <div className="py-5 text-left space-y-2 text-xs md:text-sm text-amber-900 font-mono">
+                <p><span className="font-sans font-bold text-slate-500">PASAJERA:</span> El amor de mi vida</p>
+                <p><span className="font-sans font-bold text-slate-500">CAPITÁN:</span> Antonio</p>
+                <p><span className="font-sans font-bold text-slate-500">VALIDEZ:</span> Para toda la eternidad ∞</p>
+                <p><span className="font-sans font-bold text-slate-500">BENEFICIO:</span> Besos ilimitados, abrazos infinitos y apoyo incondicional.</p>
+              </div>
+
+              <div className="bg-amber-100 p-3 rounded-xl text-center text-[10px] md:text-xs font-bold text-amber-800">
+                📸 ¡Tómale captura de pantalla a tu boleto oficial!
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400 mt-14 font-medium italic">
+              Diseñado con todo mi corazón. Felices 7 meses.
+            </p>
+          </div>
+        )}
       </section>
 
       <style jsx global>{`
