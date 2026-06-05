@@ -59,9 +59,10 @@ export default function Home() {
 
       {/* 1. PORTADA PRINCIPAL */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+        {/* CORREGIDO: Ruta con /nuestro-aniversario/ */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center scale-105 blur-[2px] opacity-25" 
-          style={{ backgroundImage: "url('/Nuestras-primera-foto.jpeg')" }}
+          style={{ backgroundImage: "url('/nuestro-aniversario/Nuestras-primera-foto.jpeg')" }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-t from-rose-50/80 via-transparent to-transparent z-0"></div>
 
@@ -118,7 +119,8 @@ export default function Home() {
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between mb-20 md:mb-32 w-full">
           <div className="w-full md:w-[45%] flex justify-center md:justify-end order-2 md:order-1">
             <div className="bg-white p-4 pb-8 shadow-xl rounded-sm transform -rotate-2 hover:rotate-0 transition-transform duration-300 max-w-xs border border-slate-100">
-              <img src="/Nuestras-primera-foto.jpeg" alt="Nuestra primera foto" className="w-full h-64 object-cover rounded-sm mb-4" />
+              {/* CORREGIDO: Ruta con /nuestro-aniversario/ */}
+              <img src="/nuestro-aniversario/Nuestras-primera-foto.jpeg" alt="Nuestra primera foto" className="w-full h-64 object-cover rounded-sm mb-4" />
               <p className="font-serif text-center text-slate-700 text-lg italic">"Donde todo comenzó... ❤️"</p>
             </div>
           </div>
@@ -126,7 +128,7 @@ export default function Home() {
           <div className="w-full md:w-[45%] text-center md:text-left order-3 pl-0 md:pl-8">
             <h3 className="text-xl md:text-2xl font-bold text-rose-600">El Primer Capítulo</h3>
             <p className="text-slate-600 mt-2 leading-relaxed">
-              Ese viaje en bus donde mi mundo cambió por completo. Guardar la timidez a un lado y empezar a escribir esta bonita historia que hoy cumple 7 meses.
+              Ese viaje en bus donde mi world cambió por completo. Guardar la timidez a un lado y empezar a escribir esta bonita historia que hoy cumple 7 meses.
             </p>
           </div>
         </div>
@@ -142,7 +144,8 @@ export default function Home() {
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-purple-400 text-white w-10 h-10 rounded-full shadow-lg border-4 border-white font-bold text-sm order-1 my-4 md:my-0">2</div>
           <div className="w-full md:w-[45%] flex justify-center order-2">
             <div className="bg-slate-900 overflow-hidden shadow-2xl rounded-3xl w-full max-w-xs aspect-[9/16] border-4 border-white">
-              <video src="/Primer-video.mp4" controls loop muted className="w-full h-full object-cover" />
+              {/* CORREGIDO: Ruta con /nuestro-aniversario/ */}
+              <video src="/nuestro-aniversario/Primer-video.mp4" controls loop muted className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -151,10 +154,12 @@ export default function Home() {
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between w-full">
           <div className="w-full md:w-[45%] flex flex-col gap-4 items-center justify-end order-2 md:order-1">
             <div className="bg-white p-3 shadow-lg rounded-2xl max-w-[240px] border border-slate-50 transform rotate-1 hover:rotate-0 transition-all duration-300">
-              <video src="/Primera foto.MOV" controls loop muted className="rounded-xl w-full h-40 object-cover" />
+              {/* CORREGIDO: Ruta con /nuestro-aniversario/ */}
+              <video src="/nuestro-aniversario/Primera foto.MOV" controls loop muted className="rounded-xl w-full h-40 object-cover" />
             </div>
             <div className="bg-white p-3 shadow-lg rounded-2xl max-w-[240px] border border-slate-50 transform -rotate-1 hover:rotate-0 transition-all duration-300 md:ml-12">
-              <video src="/Segunda foto.MOV" controls loop muted className="rounded-xl w-full h-40 object-cover" />
+              {/* CORREGIDO: Ruta con /nuestro-aniversario/ */}
+              <video src="/nuestro-aniversario/Segunda foto.MOV" controls loop muted className="rounded-xl w-full h-40 object-cover" />
             </div>
           </div>
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center bg-amber-400 text-white w-10 h-10 rounded-full shadow-lg border-4 border-white font-bold text-sm order-1 md:order-2 my-4 md:my-0">3</div>
