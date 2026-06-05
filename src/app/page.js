@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 export default function Home() {
   const fechaInicio = new Date(2025, 10, 4, 0, 0, 0); 
 
-  const [tiempo, setTiempo] = useState({ dias: 0, horas: 0, minutos: 0, segundos: 0 });
+  const [tiempo, setTiempo] = useState({ dias: 0, horas: 0, minutes: 0, segundos: 0 });
   const [cartaAbierta, setCartaAbierta] = useState(null);
   const [corazones, setCorazones] = useState([]);
   const [mostrarIntro, setMostrarIntro] = useState(true);
@@ -17,11 +17,14 @@ export default function Home() {
   const [capitulo2Abierto, setCapitulo2Abierto] = useState(false);
   const [capitulo3Abierto, setCapitulo3Abierto] = useState(false);
 
-  // Historial de cartas leídas (Guardamos el ID de las cartas que ya abrió)
+  // Historial de cartas leídas
   const [cartasLeidas, setCartasLeidas] = useState([]);
   
-  // Estado para la última pregunta
+  // Condición para quitar el candado general
   const [preguntaDesbloqueada, setPreguntaDesbloqueada] = useState(false);
+  
+  // NUEVO: Estado para abrir la carta romántica/miedo antes de la pregunta final
+  const [cartaFinalLeida, setCartaFinalLeida] = useState(false);
 
   const [noPosicion, setNoPosicion] = useState({ x: 0, y: 0 });
   const [haIntentadoNo, setHaIntentadoNo] = useState(false);
@@ -41,9 +44,8 @@ export default function Home() {
     return () => clearInterval(intervalo);
   }, []);
 
-  // EFECTO QUE REVISA SI YA ABRIÓ TODO
+  // EFECTO QUE REVISA SI YA ABRIÓ TODO LO ANTERIOR
   useEffect(() => {
-    // Requisitos: Capítulos 1, 2 y 3 verdaderos + las 4 cartas leídas (IDs 1, 2, 3 y 4)
     const todosLosCapitulos = capitulo1Abierto && capitulo2Abierto && capitulo3Abierto;
     const todasLasCartas = cartasLeidas.includes(1) && cartasLeidas.includes(2) && cartasLeidas.includes(3) && cartasLeidas.includes(4);
 
@@ -89,8 +91,6 @@ export default function Home() {
   const manejarClickCarta = (id) => {
     setCartaAbierta(cartaAbierta === id ? null : id);
     lanzarCorazones(cartaAbierta === id ? 2 : 6);
-    
-    // Si no estaba registrada como leída, la añadimos al historial
     if (!cartasLeidas.includes(id)) {
       setCartasLeidas(prev => [...prev, id]);
     }
@@ -107,7 +107,6 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-tr from-[#fff5f5] via-[#fff0f3] to-[#fef6e4] text-slate-800 font-sans overflow-x-hidden relative selection:bg-rose-200 scroll-smooth">
       
-      {/* FONDO TEXTURIZADO ATENUADO */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
       <audio ref={audioRef} src="/nuestro-aniversario/nuestra-cancion.mp3" loop />
@@ -131,7 +130,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* BOTÓN MÚSICA ESTILO VINILO */}
+      {/* BOTÓN MÚSICA */}
       {!mostrarIntro && (
         <div className="fixed bottom-6 right-6 z-[100]">
           <button 
@@ -346,18 +345,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. SECCIÓN FINAL INTERACTIVA (BLOQUEADA HASTA QUE COMPLETE TODO) */}
-      <section className="py-24 px-4 text-center max-w-xl mx-auto relative z-20 min-h-[450px] flex flex-col items-center justify-center">
+      {/* 4. SECCIÓN FINAL INTERACTIVA (CON EL PASO DEL MIEDO/ROMANTICISMO) */}
+      <section className="py-24 px-4 text-center max-w-xl mx-auto relative z-20 min-h-[480px] flex flex-col items-center justify-center">
         
-        {!preguntaDesbloqueada ? (
-          /* VISTA BLOQUEADA: CAJA DE REGALO CON CANDADO */
+        {/* PASO A: BLOQUEADO (FALTA LEER CONTENIDO PREVIO) */}
+        {!preguntaDesbloqueada && (
           <div className="bg-slate-100/60 border-2 border-dashed border-slate-300 p-8 rounded-[2.5rem] w-full flex flex-col items-center justify-center animate-reveal">
             <span className="text-4xl mb-4 animate-bounce">🔒</span>
             <h3 className="text-lg font-black text-slate-700 tracking-tight mb-1">El Gran Final está Bloqueado</h3>
             <p className="text-slate-400 text-xs max-w-xs leading-relaxed font-medium">
               Para descubrir el último secreto, primero debes <strong className="text-rose-500">abrir los 3 capítulos</strong> de nuestra historia y <strong className="text-rose-500">leer los 4 sobres</strong> de arriba.
             </p>
-            {/* Barra de progreso sutil */}
             <div className="w-48 bg-slate-200 h-2 rounded-full mt-5 overflow-hidden">
               <div 
                 className="bg-gradient-to-r from-rose-400 to-pink-500 h-full transition-all duration-500"
@@ -367,38 +365,79 @@ export default function Home() {
               ></div>
             </div>
           </div>
-        ) : !juegoGanado ? (
-          /* VISTA DESBLOQUEADA: PREGUNTA ACTIVA */
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-100 w-full animate-scale-up">
-            <span className="text-3xl mb-3 block animate-pulse">💝</span>
-            <h3 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight mb-2">Una Última Pregunta...</h3>
-            <p className="text-slate-500 text-xs md:text-sm mb-8 font-medium leading-relaxed">
-              ¿Me dejarías seguir haciéndote la mujer más feliz del universo por el resto de nuestros meses y años? 🧸
+        )}
+
+        {/* PASO B: DESBLOQUEADO PERO CERRADO (SOBRE FINAL ÍNTIMO) */}
+        {preguntaDesbloqueada && !cartaFinalLeida && (
+          <div 
+            onClick={() => { setCartaFinalLeida(true); lanzarCorazones(25); }}
+            className="bg-gradient-to-br from-rose-50 via-white to-pink-50 p-8 rounded-[2.5rem] shadow-[0_20px_40px_rgba(244,63,94,0.06)] border border-rose-200 w-full flex flex-col items-center justify-center cursor-pointer transform hover:-translate-y-1 transition-all duration-500 group animate-scale-up"
+          >
+            <span className="text-5xl mb-4 block group-hover:scale-110 transition-transform duration-300 animate-pulse">✉️❤️‍🔥</span>
+            <h3 className="text-xl font-black text-slate-800 tracking-tight mb-2">Has desbloqueado algo...</h3>
+            <p className="text-slate-500 text-xs max-w-xs leading-relaxed font-medium mb-6">
+              Apareció una última carta escrita desde el fondo de mi alma. Solo para tus ojos.
             </p>
+            <button className="bg-rose-500 text-white font-black px-6 py-3 rounded-full text-[10px] uppercase tracking-widest shadow-md group-hover:bg-rose-600 transition-colors">
+              Abrir Confesión Secreta ✨
+            </button>
+          </div>
+        )}
 
-            <div className="flex items-center justify-center gap-4 h-14 relative">
-              <button 
-                onClick={() => { setJuegoGanado(true); lanzarCorazones(60); }}
-                className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3.5 rounded-full shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs uppercase tracking-widest z-10 border-b-4 border-emerald-600"
-              >
-                ¡SÍ, OBVIO! 💖
-              </button>
+        {/* PASO C: CARTA ABIERTA (ROMANTICISMO + MIEDO) */}
+        {preguntaDesbloqueada && cartaFinalLeida && !juegoGanado && (
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_25px_60px_rgba(0,0,0,0.04)] border border-slate-100 w-full animate-fold-open text-left relative">
+            {/* Cinta decorativa vintage */}
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-rose-200/60 w-24 h-5 rotate-1 pointer-events-none"></div>
+            
+            <h3 className="text-xs uppercase tracking-widest font-black text-rose-500 mb-4 text-center">Antes de que me respondas...</h3>
+            
+            <div className="text-slate-600 text-xs md:text-sm leading-relaxed font-medium space-y-4 mb-8 italic">
+              <p>
+                "Mi amor... Diseñar todo esto me hizo revivir cada segundo a tu lado, y no te imaginas lo increíblemente afortunado que me siento. Pero serte sincero también significa abrirte mi corazón por completo, incluso con mis temores."
+              </p>
+              <p>
+                "A veces me asusta el futuro, y si te soy honesto, me da un miedo profundo no ser lo suficientemente perfecto para ti o cometer errores que desgasten lo nuestro. Me da pánico la sola idea de perderte, porque te has convertido en mi hogar, en mi paz y en el motivo de mis sonrisas más sinceras."
+              </p>
+              <p>
+                "Eres lo más valioso que tengo, princesa. Y precisamente porque me importas más que nada en este mundo, quiero prometerte que voy a cuidar de ti, de nosotros, con todas mis fuerzas. No quiero un futuro donde no estés tú."
+              </p>
+            </div>
 
-              <button 
-                onMouseEnter={moverBotonNo}
-                onClick={moverBotonNo}
-                style={{
-                  transform: `translate(${noPosicion.x}px, ${noPosicion.y}px)`,
-                  transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)'
-                }}
-                className="bg-slate-100 text-slate-400 font-bold px-5 py-2.5 rounded-full text-xs shadow-xs cursor-pointer whitespace-nowrap select-none border border-slate-200/40"
-              >
-                {haIntentadoNo ? "¡No se puede! 😜" : "No, gracias"}
-              </button>
+            <hr className="border-dashed border-slate-200 mb-6" />
+
+            {/* PREGUNTA FINAL Y BOTONES */}
+            <div className="text-center">
+              <h4 className="text-base md:text-lg font-black text-slate-800 tracking-tight mb-6">
+                Sabiendo esto... ¿Me dejarías seguir haciéndote la mujer más feliz del universo por el resto de nuestros meses y años? 🧸
+              </h4>
+
+              <div className="flex items-center justify-center gap-4 h-14 relative">
+                <button 
+                  onClick={() => { setJuegoGanado(true); lanzarCorazones(60); }}
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black px-8 py-3.5 rounded-full shadow-md hover:scale-105 active:scale-95 transition-all duration-300 text-xs uppercase tracking-widest z-10 border-b-4 border-emerald-600"
+                >
+                  ¡SÍ, OBVIO! 💖
+                </button>
+
+                <button 
+                  onMouseEnter={moverBotonNo}
+                  onClick={moverBotonNo}
+                  style={{
+                    transform: `translate(${noPosicion.x}px, ${noPosicion.y}px)`,
+                    transition: 'transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                  }}
+                  className="bg-slate-100 text-slate-400 font-bold px-5 py-2.5 rounded-full text-xs shadow-xs cursor-pointer whitespace-nowrap select-none border border-slate-200/40"
+                >
+                  {haIntentadoNo ? "¡No se puede! 😜" : "No, gracias"}
+                </button>
+              </div>
             </div>
           </div>
-        ) : (
-          /* TICKET FINAL */
+        )}
+
+        {/* PASO D: PANTALLA GANADA (TICKET FINAL) */}
+        {juegoGanado && (
           <div className="w-full animate-scale-up flex flex-col items-center">
             <div className="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden mb-6 w-full border border-purple-900/30">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:16px_16px]"></div>
