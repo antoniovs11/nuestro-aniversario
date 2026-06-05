@@ -12,9 +12,16 @@ export default function Home() {
   const [clickContador, setClickContador] = useState(0);
   const audioRef = useRef(null);
 
+  // Estados de los capítulos
   const [capitulo1Abierto, setCapitulo1Abierto] = useState(false);
   const [capitulo2Abierto, setCapitulo2Abierto] = useState(false);
   const [capitulo3Abierto, setCapitulo3Abierto] = useState(false);
+
+  // Historial de cartas leídas (Guardamos el ID de las cartas que ya abrió)
+  const [cartasLeidas, setCartasLeidas] = useState([]);
+  
+  // Estado para la última pregunta
+  const [preguntaDesbloqueada, setPreguntaDesbloqueada] = useState(false);
 
   const [noPosicion, setNoPosicion] = useState({ x: 0, y: 0 });
   const [haIntentadoNo, setHaIntentadoNo] = useState(false);
@@ -33,6 +40,17 @@ export default function Home() {
     }, 1000);
     return () => clearInterval(intervalo);
   }, []);
+
+  // EFECTO QUE REVISA SI YA ABRIÓ TODO
+  useEffect(() => {
+    // Requisitos: Capítulos 1, 2 y 3 verdaderos + las 4 cartas leídas (IDs 1, 2, 3 y 4)
+    const todosLosCapitulos = capitulo1Abierto && capitulo2Abierto && capitulo3Abierto;
+    const todasLasCartas = cartasLeidas.includes(1) && cartasLeidas.includes(2) && cartasLeidas.includes(3) && cartasLeidas.includes(4);
+
+    if (todosLosCapitulos && todasLasCartas) {
+      setPreguntaDesbloqueada(true);
+    }
+  }, [capitulo1Abierto, capitulo2Abierto, capitulo3Abierto, cartasLeidas]);
 
   const iniciarExperiencia = () => {
     setMostrarIntro(false);
@@ -68,6 +86,16 @@ export default function Home() {
     }, 6000);
   };
 
+  const manejarClickCarta = (id) => {
+    setCartaAbierta(cartaAbierta === id ? null : id);
+    lanzarCorazones(cartaAbierta === id ? 2 : 6);
+    
+    // Si no estaba registrada como leída, la añadimos al historial
+    if (!cartasLeidas.includes(id)) {
+      setCartasLeidas(prev => [...prev, id]);
+    }
+  };
+
   const moverBotonNo = () => {
     setHaIntentadoNo(true);
     const randomX = Math.random() * (140 - (-140)) + (-140);
@@ -79,12 +107,12 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gradient-to-tr from-[#fff5f5] via-[#fff0f3] to-[#fef6e4] text-slate-800 font-sans overflow-x-hidden relative selection:bg-rose-200 scroll-smooth">
       
-      {/* FONTO TEXTURIZADO ATENUADO */}
+      {/* FONDO TEXTURIZADO ATENUADO */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(244,63,94,0.03)_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
 
       <audio ref={audioRef} src="/nuestro-aniversario/nuestra-cancion.mp3" loop />
 
-      {/* 0. PANTALLA DE INTRODUCCIÓN ESTILO CARTA DE REGALO */}
+      {/* 0. PANTALLA DE INTRODUCCIÓN */}
       {mostrarIntro && (
         <div className="fixed inset-0 bg-gradient-to-tr from-rose-500 via-pink-500 to-amber-400 z-[9999] flex flex-col items-center justify-center p-4 text-center">
           <div className="bg-white/10 backdrop-blur-2xl p-8 md:p-12 rounded-[2.5rem] border border-white/30 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.3)] max-w-md mx-auto transform animate-pulse-slow z-10">
@@ -116,7 +144,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* LLUVIA DE CORAZONES SUAVES */}
+      {/* LLUVIA DE CORAZONES */}
       {corazones.map((corazon) => (
         <span
           key={corazon.id}
@@ -134,7 +162,7 @@ export default function Home() {
         </span>
       ))}
 
-      {/* 1. PORTADA PRINCIPAL (MENOS SECA, MÁS ORGÁNICA) */}
+      {/* 1. PORTADA PRINCIPAL */}
       <section className="relative h-screen flex flex-col items-center justify-center text-center px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#fff5f5] z-10"></div>
         
@@ -149,7 +177,6 @@ export default function Home() {
             Cada segundo a tu lado es una nueva página de amor. Mira cuánto tiempo lleva latiendo mi corazón por ti:
           </p>
 
-          {/* CONTADOR EN CUADRO FLOTANTE ESTILO DIARIO */}
           <div 
             onClick={() => { setClickContador(c => c + 1); lanzarCorazones(8); }}
             className="grid grid-cols-4 gap-3 md:gap-5 max-w-md mx-auto bg-white p-5 rounded-[2rem] shadow-[0_20px_40px_rgba(0,0,0,0.04)] border border-slate-100 cursor-pointer transform hover:-translate-y-1 hover:shadow-[0_25px_50px_rgba(244,63,94,0.08)] active:scale-98 transition-all duration-500 group relative"
@@ -170,14 +197,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 2. LÍNEA DEL TIEMPO EN CADENA (CON DISEÑO EFECTO PAPEL) */}
+      {/* 2. LÍNEA DEL TIEMPO */}
       <section className="max-w-3xl mx-auto px-4 py-20 relative">
         <div className="text-center mb-16">
           <h2 className="text-3xl font-black text-slate-800 tracking-tight">Nuestros Recuerdos Guardados</h2>
           <p className="text-slate-400 text-sm mt-1 font-medium">Debes abrir un capítulo para desbloquear el siguiente... ✨</p>
         </div>
 
-        {/* Línea central sutil */}
         <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 bg-gradient-to-b from-rose-200 via-purple-200 to-amber-200 h-[80%] top-44 z-0"></div>
 
         {/* CAPÍTULO 1 */}
@@ -194,7 +220,6 @@ export default function Home() {
           ) : (
             <div className="mt-12 w-full bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_15px_35px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col md:flex-row gap-6 items-center animate-fold-open">
               <div className="w-full md:w-[40%] flex justify-center">
-                {/* Cuadro Polarod con cinta washi */}
                 <div className="bg-white p-3 pb-8 shadow-xl rounded-sm transform -rotate-2 border border-slate-100 relative group max-w-[200px]">
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-200/60 w-16 h-4 rotate-1 pointer-events-none"></div>
                   <img src="/nuestro-aniversario/Nuestras-primera-foto.jpeg" alt="Nuestra primera foto" className="w-full h-48 object-cover rounded-xs" />
@@ -274,7 +299,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. CARTAS DE AMOR DIGITALES (CON ANIMACIÓN DE LEVANTAMIENTO) */}
+      {/* 3. CARTAS DE AMOR DIGITALES */}
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
@@ -293,7 +318,7 @@ export default function Home() {
               return (
                 <div 
                   key={card.id}
-                  onClick={() => { setCartaAbierta(isOpen ? null : card.id); lanzarCorazones(isOpen ? 2 : 6); }}
+                  onClick={() => manejarClickCarta(card.id)}
                   className={`bg-white p-5 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.02)] border cursor-pointer transition-all duration-500 text-center flex flex-col justify-center items-center h-64 relative overflow-hidden ${
                     isOpen 
                       ? 'border-rose-300 ring-4 ring-rose-50/50 scale-102 bg-radial-card' 
@@ -309,7 +334,9 @@ export default function Home() {
                     <div className="flex flex-col items-center">
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4 shadow-inner ${card.special ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-50'}`}>{card.icon}</div>
                       <h4 className="font-black text-slate-700 text-xs uppercase tracking-wider">{card.title}</h4>
-                      <span className="text-[9px] text-slate-400 mt-2 font-bold bg-slate-50 px-3 py-1 rounded-full uppercase tracking-widest group-hover:bg-slate-100">Leer</span>
+                      <span className="text-[9px] text-slate-400 mt-2 font-bold bg-slate-50 px-3 py-1 rounded-full uppercase tracking-widest">
+                        {cartasLeidas.includes(card.id) ? 'Leída ✓' : 'Leer'}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -319,11 +346,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. SECCIÓN FINAL INTERACTIVA (EL BOTÓN TRAMPA Y TICKET DE LUJO) */}
+      {/* 4. SECCIÓN FINAL INTERACTIVA (BLOQUEADA HASTA QUE COMPLETE TODO) */}
       <section className="py-24 px-4 text-center max-w-xl mx-auto relative z-20 min-h-[450px] flex flex-col items-center justify-center">
-        {!juegoGanado ? (
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-100 w-full animate-reveal">
-            <span className="text-3xl mb-3 block">🥺</span>
+        
+        {!preguntaDesbloqueada ? (
+          /* VISTA BLOQUEADA: CAJA DE REGALO CON CANDADO */
+          <div className="bg-slate-100/60 border-2 border-dashed border-slate-300 p-8 rounded-[2.5rem] w-full flex flex-col items-center justify-center animate-reveal">
+            <span className="text-4xl mb-4 animate-bounce">🔒</span>
+            <h3 className="text-lg font-black text-slate-700 tracking-tight mb-1">El Gran Final está Bloqueado</h3>
+            <p className="text-slate-400 text-xs max-w-xs leading-relaxed font-medium">
+              Para descubrir el último secreto, primero debes <strong className="text-rose-500">abrir los 3 capítulos</strong> de nuestra historia y <strong className="text-rose-500">leer los 4 sobres</strong> de arriba.
+            </p>
+            {/* Barra de progreso sutil */}
+            <div className="w-48 bg-slate-200 h-2 rounded-full mt-5 overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-rose-400 to-pink-500 h-full transition-all duration-500"
+                style={{ 
+                  width: `${(( (capitulo1Abierto?1:0) + (capitulo2Abierto?1:0) + (capitulo3Abierto?1:0) + cartasLeidas.length ) / 7) * 100}%` 
+                }}
+              ></div>
+            </div>
+          </div>
+        ) : !juegoGanado ? (
+          /* VISTA DESBLOQUEADA: PREGUNTA ACTIVA */
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-100 w-full animate-scale-up">
+            <span className="text-3xl mb-3 block animate-pulse">💝</span>
             <h3 className="text-xl md:text-2xl font-black text-slate-800 tracking-tight mb-2">Una Última Pregunta...</h3>
             <p className="text-slate-500 text-xs md:text-sm mb-8 font-medium leading-relaxed">
               ¿Me dejarías seguir haciéndote la mujer más feliz del universo por el resto de nuestros meses y años? 🧸
@@ -351,7 +398,7 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          /* TICKET TOTALMENTE REDISEÑADO CON ESTILO VINTAGE / DIGITAL */
+          /* TICKET FINAL */
           <div className="w-full animate-scale-up flex flex-col items-center">
             <div className="bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900 text-white p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden mb-6 w-full border border-purple-900/30">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:16px_16px]"></div>
@@ -362,9 +409,7 @@ export default function Home() {
               </p>
             </div>
 
-            {/* TICKET PREMIUM TIPO BOLETO DE EMBARQUE */}
             <div className="bg-[#fdfbf7] border-2 border-[#e6dfd3] p-5 rounded-2xl shadow-xl max-w-sm w-full relative transform rotate-1 hover:rotate-0 transition-transform duration-500 border-t-8 border-t-amber-400">
-              {/* Entalladuras laterales de ticket */}
               <div className="absolute top-1/2 -left-3 w-5 h-5 bg-[#fff5f5] rounded-full border-r-2 border-[#e6dfd3] transform -translate-y-1/2"></div>
               <div className="absolute top-1/2 -right-3 w-5 h-5 bg-[#fff5f5] rounded-full border-l-2 border-[#e6dfd3] transform -translate-y-1/2"></div>
               
@@ -395,7 +440,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* COMPORTAMIENTO DE ANIMACIONES MEJORADO EN CSS */}
+      {/* ESTILOS GLOBALES */}
       <style jsx global>{`
         @keyframes floatUp {
           0% { transform: translateY(0) rotate(0deg) scale(0.7); opacity: 0; }
